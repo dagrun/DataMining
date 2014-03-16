@@ -5,7 +5,7 @@ import sys
 
 
 def partition(video_id, shingles):
-    pass
+    print (video_id, shingles)
 
 if __name__ == "__main__":
     # Very important. Make sure that each machine is using the
