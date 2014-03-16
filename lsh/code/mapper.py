@@ -5,28 +5,28 @@ import sys
 
 def partition(video_id, shingles):
     sigmatrix.append([])
-    #iterates over the number of hashfunctions
+    # iterates over the number of hashfunctions
     for i in range(0,numOfHash):
         minShing = ((a[i]*shingles[0])+b[i])%10000
-        #iterates over all the shingles in a video
+        # iterates over all the shingles in a video
         for shingle in shingles:
             hashShingle = ((a[i]*shingle)+b[i])%10000
             if hashShingle < minShing:
                 minShing = hashShingle
-        #store the smalest value for that video, using this hashfunction.
+        # store the smalest value for that video, using this hashfunction.
         sigmatrix[video_id].append(minShing)
 
 if __name__ == "__main__":
     # Very important. Make sure that each machine is using the
     # same seed when generating random numbers for the hash functions.
     np.random.seed(seed=42)
-    numOfHash = 2 #number of hash functions we want to use when making signature matrixes
+    numOfHash = 2 # number of hash functions we want to use when making signature matrixes
     
-    a = np.random.randint(1,10000,numOfHash) #a is used to make the hashfunction a*i+b modula 10000
-    b = np.random.randint(0,10000,numOfHash) #b is used to make the hashfunction a*i+b modula 10000
-    sigmatrix = [] #used to store our signature matrix
+    a = np.random.randint(1,10000,numOfHash) # a is used to make the hashfunction a*i+b modula 10000
+    b = np.random.randint(0,10000,numOfHash) # b is used to make the hashfunction a*i+b modula 10000
+    sigmatrix = [] # used to store our signature matrix
     
-    #iterates over the videos
+    # iterates over the videos
     for line in sys.stdin:
         line = line.strip()
         video_id = int(line[6:15])
