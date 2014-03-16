@@ -6,7 +6,7 @@ import sys
 def partition(video_id, shingles):
     sigmatrix.append([])
     # iterates over the number of hashfunctions
-    for i in range(0,numOfHash):
+    for i in xrange(0,numOfHash):
         minShing = ((a[i]*shingles[0])+b[i])%10000
         # iterates over all the shingles in a video
         for shingle in shingles:
@@ -21,9 +21,17 @@ if __name__ == "__main__":
     # same seed when generating random numbers for the hash functions.
     np.random.seed(seed=42)
     numOfHash = 2 # number of hash functions we want to use when making signature matrixes
+    debug = False
+    
+    if len(sys.argv) > 1 and sys.argv[1] == '-d':
+        debug = True
     
     a = np.random.randint(1,10000,numOfHash) # a is used to make the hashfunction a*i+b modula 10000
     b = np.random.randint(0,10000,numOfHash) # b is used to make the hashfunction a*i+b modula 10000
+    
+    if debug:
+        for i in xrange(len(a)): print 'h_'+ str(i) + '(x) = x*'+ str(a[i]) +' + '+ str(b[i])
+    
     sigmatrix = [] # used to store our signature matrix
     
     # iterates over the videos
@@ -34,5 +42,6 @@ if __name__ == "__main__":
         partition(video_id, shingles)
     
     sigmatrix = np.matrix(sigmatrix, np.int32).T
-    print sigmatrix
+    
+    if debug: print sigmatrix
 
