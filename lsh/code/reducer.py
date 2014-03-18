@@ -3,7 +3,6 @@
 import numpy as np
 import sys
 
-
 def print_duplicates(videos):
     unique = np.unique(videos)
     for i in xrange(len(unique)):

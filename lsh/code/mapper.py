@@ -3,6 +3,9 @@
 import numpy as np
 import sys
 
+def emit(key, value):
+    print('%s\t%s' % (key, value))
+
 def partition(video_id, shingles):
     sigmatrix.append([])
     # iterates over the number of hashfunctions
@@ -20,17 +23,22 @@ if __name__ == "__main__":
     # Very important. Make sure that each machine is using the
     # same seed when generating random numbers for the hash functions.
     np.random.seed(seed=42)
-    numOfHash = 2 # number of hash functions we want to use when making signature matrixes
-    debug = False
+    numOfHash = 256 # number of hash functions we want to use when making signature matrixes
+    bands = 32
+    rowsPerBand = numOfHash / bands
+    verbose = False
     
-    if len(sys.argv) > 1 and sys.argv[1] == '-d':
-        debug = True
+    if len(sys.argv) > 1 and sys.argv[1] == '-v':
+        verbose = True
     
     a = np.random.randint(1,10000,numOfHash) # a is used to make the hashfunction a*i+b modula 10000
     b = np.random.randint(0,10000,numOfHash) # b is used to make the hashfunction a*i+b modula 10000
     
-    if debug:
-        for i in xrange(len(a)): print 'h_'+ str(i) + '(x) = x*'+ str(a[i]) +' + '+ str(b[i])
+    if verbose:
+    	print str(numOfHash) +' hash functions'
+    	print str(bands) +' bands'
+    	print str(rowsPerBand) +' rows per band'
+        for i in xrange(len(a)): print 'h_'+ str(i) +'(x) = x*'+ str(a[i]) +' + '+ str(b[i])
     
     sigmatrix = [] # used to store our signature matrix
     
@@ -40,8 +48,25 @@ if __name__ == "__main__":
         video_id = int(line[6:15])
         shingles = np.fromstring(line[16:], sep=" ")
         partition(video_id, shingles)
+        # do stuff here
     
     sigmatrix = np.matrix(sigmatrix, np.int32).T
     
-    if debug: print sigmatrix
+    if verbose:
+        print 'dimensions of the signature matrix '+ str(sigmatrix.shape)
+        print sigmatrix
+    
+    a = np.random.randint(1,10000,rowsPerBand)
+    b = np.random.randint(0,10000,rowsPerBand)
+    
+    #print b.shape
+    #b = np.tile(b, (rowsPerBand, 1))
+    #print b.shape
+    
+    for bid in xrange(bands):
+        currentBand = sigmatrix[bid*rowsPerBand:(bid+1)*rowsPerBand]
+        
+        buckets = a.dot(currentBand) % numOfHash
+        for i in xrange():
+            emit((bid, buckets.item(i)), i)
 
