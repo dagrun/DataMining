@@ -7,7 +7,7 @@ def emit(key, value):
     print('%s\t%s' % (key, value))
 
 def partition(video_id, shingles):
-    sigmatrix.append([])
+    sigcol = []
     # iterates over the number of hashfunctions
     for i in xrange(0,numOfHash):
         minShing = ((a[i]*shingles[0])+b[i])%10000
@@ -17,16 +17,19 @@ def partition(video_id, shingles):
             if hashShingle < minShing:
                 minShing = hashShingle
         # store the smalest value for that video, using this hashfunction.
-        sigmatrix[video_id].append(minShing)
+        sigcol.append(minShing)
+    return sigcol
+
+verbose = False
+numOfHash = 256 # number of hash functions we want to use when making signature matrixes
+bands = 32
+rowsPerBand = numOfHash / bands
 
 if __name__ == "__main__":
     # Very important. Make sure that each machine is using the
     # same seed when generating random numbers for the hash functions.
     np.random.seed(seed=42)
-    numOfHash = 256 # number of hash functions we want to use when making signature matrixes
-    bands = 32
-    rowsPerBand = numOfHash / bands
-    verbose = False
+    
     
     if len(sys.argv) > 1 and sys.argv[1] == '-v':
         verbose = True
@@ -40,33 +43,21 @@ if __name__ == "__main__":
     	print str(rowsPerBand) +' rows per band'
         for i in xrange(len(a)): print 'h_'+ str(i) +'(x) = x*'+ str(a[i]) +' + '+ str(b[i])
     
-    sigmatrix = [] # used to store our signature matrix
+    aBand = np.random.randint(1,10000,rowsPerBand).T
+    bBand = np.random.randint(0,10000,1)
     
     # iterates over the videos
     for line in sys.stdin:
         line = line.strip()
         video_id = int(line[6:15])
-        shingles = np.fromstring(line[16:], sep=" ")
-        partition(video_id, shingles)
-        # do stuff here
-    
-    sigmatrix = np.matrix(sigmatrix, np.int32).T
-    
-    if verbose:
-        print 'dimensions of the signature matrix '+ str(sigmatrix.shape)
-        print sigmatrix
-    
-    a = np.random.randint(1,10000,rowsPerBand)
-    b = np.random.randint(0,10000,rowsPerBand)
-    
-    #print b.shape
-    #b = np.tile(b, (rowsPerBand, 1))
-    #print b.shape
-    
-    for bid in xrange(bands):
-        currentBand = sigmatrix[bid*rowsPerBand:(bid+1)*rowsPerBand]
+        shingles = np.fromstring(line[16:], np.int32, sep=" ")
         
-        buckets = a.dot(currentBand) % numOfHash
-        for i in xrange():
-            emit((bid, buckets.item(i)), i)
+        sigcol = partition(video_id, shingles)
+        sigcol = np.array(sigcol, np.int32)
+        
+        for bid in xrange(rowsPerBand):
+            currentBand = sigcol[bid*rowsPerBand:(bid+1)*rowsPerBand]
+            
+            hashValue = ((aBand.dot(currentBand) + bBand) % numOfHash).item(0)
+            emit((bid, hashValue), video_id)
 
