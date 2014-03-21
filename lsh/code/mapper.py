@@ -22,7 +22,7 @@ def partition(video_id, shingles):
 
 verbose = False
 numOfHash = 256 # number of hash functions we want to use when making signature matrixes
-bands = 32
+bands = 16
 rowsPerBand = numOfHash / bands
 
 if __name__ == "__main__":
@@ -46,6 +46,11 @@ if __name__ == "__main__":
     aBand = np.random.randint(1,10000,rowsPerBand).T
     bBand = np.random.randint(0,10000,1)
     
+    if verbose:
+    	print '-------------------------------'
+    	print str(rowsPerBand) +' hash functions'
+        for i in xrange(len(aBand)): print 'h_'+ str(i) +'(x) = x*'+ str(aBand[i]) +' + '+ str(bBand[0])
+    
     # iterates over the videos
     for line in sys.stdin:
         line = line.strip()
@@ -55,9 +60,13 @@ if __name__ == "__main__":
         sigcol = partition(video_id, shingles)
         sigcol = np.array(sigcol, np.int32)
         
-        for bid in xrange(rowsPerBand):
+        for bid in xrange(bands):
             currentBand = sigcol[bid*rowsPerBand:(bid+1)*rowsPerBand]
             
-            hashValue = ((aBand.dot(currentBand) + bBand) % numOfHash).item(0)
+            hashValue = (aBand.dot(currentBand) + bBand).item(0)
+            
+            if verbose:
+                print str(currentBand) +' mapped into '+ str(hashValue)
+            
             emit((bid, hashValue), video_id)
 
