@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 
 import numpy as np
 import sys
@@ -68,5 +68,5 @@ if __name__ == "__main__":
             if verbose:
                 print str(currentBand) +' mapped into '+ str(hashValue)
             
-            emit((bid, hashValue), video_id)
+            emit((bid, hashValue), (video_id, shingles.tolist()))
 
