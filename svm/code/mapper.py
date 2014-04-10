@@ -24,9 +24,8 @@ if __name__ == "__main__":
     
     y = np.array(y)
     
-    clf = svm.SVC(kernel='linear', gamma=0.001, C=100., verbose=True, max_iter=2)
+    clf = svm.SVC(kernel='linear', gamma=0.001, C=100.)
     clf.fit(X, y)
-#    print clf.coef_
     
-#    emit(uuid.uuid4(), )
+    emit(uuid.uuid4(), clf.coef_[0].tolist())
 
