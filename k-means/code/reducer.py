@@ -1,40 +1,49 @@
 #!/usr/bin/env python2.7
 
-import numpy as np
 import sys
+import numpy as np
 from ast import literal_eval
-
-values = None
-N = 0
-
-#def listify(row):
-#    return ' '.join(map(str, row.tolist()))
+from scipy.spatial.distance import cdist
 
 if __name__ == "__main__":
+    XA = XB = None
+    result = None
     for line in sys.stdin:
         line = line.strip()
         key, value = line.split('\t')
-        value = np.asmatrix(literal_eval(value))
+        sample = literal_eval(value)
+        result = sample
         
-        if values is None:
-            values = value
-        else:
-            values += value
-        
-        N += 1
-    
-    values = values / float(N)
+#        if XA is None:
+#            XA = np.asarray(sample)
+#        else:
+#            XB = np.asarray(sample)
+#            distances = cdist(XA, XB, 'euclidean')
+#            
+#            max_value = 10000
+#            result = []
+#            while(distances.min() < max_value):
+#                distances_as_list = list(np.array(distances).reshape(-1,))
+#                mins = sorted([x for x in distances_as_list if x < max_value])
+#                
+#                for x in xrange(distances.shape[0]):
+#                    for y in xrange(distances.shape[1]):
+#                    
+#                        if distances[x][y] == mins[0]:
+#                            result.append((XA[x] + XB[y])/float(2))
+#                            distances[x,:] = max_value
+#                            distances[:,y] = max_value
     
     i = 0
-    values_list = values.tolist()
-    while i < len(values_list):
+    centers = result
+    while i < len(centers):
         j = 0
-        while j < len(values_list[i]):
-            if j != len(values_list[i]) -1:
-                sys.stdout.write(str(values_list[i][j]) + ' ')
+        while j < len(centers[i]):
+            if j != len(centers[i]) -1:
+                sys.stdout.write(str(centers[i][j]) + ' ')
             else:
-                sys.stdout.write(str(values_list[i][j]) + '\n')
+                sys.stdout.write(str(centers[i][j]) + '\n')
             
             j += 1
         i += 1 
-#    print '\n'.join(np.apply_along_axis( listify, axis=1, arr=values / float(N) ) )
+

@@ -14,7 +14,7 @@ if __name__ == "__main__":
         
         X = np.vstack( (X, sample) )
     
-    mbk = MiniBatchKMeans(n_clusters=200, init='k-means++', n_init=5, batch_size=150)
+    mbk = MiniBatchKMeans(n_clusters=200, init='k-means++', n_init=5)
     mbk.fit(X)
     
     emit(1, mbk.cluster_centers_.tolist())
