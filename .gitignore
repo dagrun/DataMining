@@ -1,2 +1,3 @@
 svm/visual_test/images/
-k-means/data/
+k-means/data/tiny_subset.zip
+k-means/data/training.csv
