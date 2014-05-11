@@ -6,24 +6,37 @@ from ast import literal_eval
 from scipy.spatial.distance import cdist
 
 if __name__ == "__main__":
-    XA = XB = None
     result = None
+    last_key = None
+    centers = np.zeros(shape=(0, 750))
+    center = None
+    prev_weight = None
     for line in sys.stdin:
         line = line.strip()
         key, value = line.split('\t')
-        sample = literal_eval(value)
+        sample, weight = literal_eval(value)
+        sample = np.asarray(sample)
         
-        if XA is None:
-            XA = np.asarray(sample)
+        if last_key is None:
+            center = sample
+            prev_weight = weight
+            last_key = key
+
+        if key == last_key:
+            prev_weight += weight
+            center += sample
         else:
-            XB = np.asarray(sample)
-            distances = cdist(XA, XB, 'euclidean').tolist()
-            
-            for i in xrange(len(distances)):
-                XA[i] = (XA[i] + XB[distances[i].index(min(distances[i]))]) / float(2)
+            center = center / float(prev_weight)
+            centers = np.vstack( (centers, center) )
+            center = sample
+            prev_weight = weight
+            last_key = key
+    
+    center = center / float(prev_weight)
+    centers = np.vstack( (centers, center) )
     
     i = 0
-    centers = XA
+    centers = centers.tolist()
     while i < len(centers):
         j = 0
         while j < len(centers[i]):
