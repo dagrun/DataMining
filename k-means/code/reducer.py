@@ -4,39 +4,42 @@ import sys
 import numpy as np
 from ast import literal_eval
 from scipy.spatial.distance import cdist
+from sklearn.cluster import MiniBatchKMeans
 
 if __name__ == "__main__":
-    result = None
-    last_key = None
-    centers = np.zeros(shape=(0, 750))
-    center = None
-    prev_weight = None
+    X = np.zeros(shape=(0, 751))
     for line in sys.stdin:
         line = line.strip()
         key, value = line.split('\t')
-        sample, weight = literal_eval(value)
-        sample = np.asarray(sample)
+        sample = literal_eval(value)
+        X = np.vstack( (X, sample) )
         
-        if last_key is None:
-            center = sample
-            prev_weight = weight
-            last_key = key
+    centers_weighted = np.random.random( (200, 751) ) * 2 - 1
+    
+    distances = cdist(X, centers_weighted, 'euclidean')
+    i=0
+    for sample in distances:
+        low = sys.maxint
+        assigned_center = None
+        j = 0
+        for center in sample:
+            if center < low:
+                low = center
+                assigned_center = j
+            j = j+1
+        centers_weighted[assigned_center, 0:750] = centers_weighted[assigned_center, 0:750]+(X[i,0:750]*X[i,750])
+        centers_weighted[assigned_center, 750] += X[i,750]
+        i = i+1
+    centers = []
 
-        if key == last_key:
-            prev_weight += weight
-            center += sample
-        else:
-            center = center / float(prev_weight)
-            centers = np.vstack( (centers, center) )
-            center = sample
-            prev_weight = weight
-            last_key = key
-    
-    center = center / float(prev_weight)
-    centers = np.vstack( (centers, center) )
-    
+    for center in centers_weighted:
+        centers.append(center[0:750]/center[750])
     i = 0
-    centers = centers.tolist()
+    
+    mbk = MiniBatchKMeans(n_clusters=200, init='k-means++', n_init=5)
+    mbk.fit(centers)
+    centers = mbk.cluster_centers_
+
     while i < len(centers):
         j = 0
         while j < len(centers[i]):

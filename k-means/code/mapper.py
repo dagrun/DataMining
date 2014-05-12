@@ -2,7 +2,7 @@
 
 import sys
 import numpy as np
-from scipy.spatial.distance import cdist
+from sklearn.cluster import MiniBatchKMeans
 
 def emit(key, value):
     print('%s\t%s' % (key, value))
@@ -14,31 +14,20 @@ if __name__ == "__main__":
         
         X = np.vstack( (X, sample) )
     
-    np.random.seed(seed=42)
     
-    init_centers = np.random.random( (200, 750) ) * 2 - 1
-    
+    mbk = MiniBatchKMeans(n_clusters=200, init='k-means++', n_init=5)
+
+    mbk.fit(X)
+    centers_weighted = mbk.cluster_centers_
+    closest_center = mbk.fit_predict(X)
+    centers_weighted = np.hstack((centers_weighted, np.zeros(shape=(200,1)))) 
+    for center in closest_center:
+        centers_weighted[center][750]=centers_weighted[center][750]+1
     i = 0
-    centers = {}
-    distances = None
-    for center in init_centers:
-        centers[i] = (center, 1)
-        i += 1
-    
-    distances = cdist(X, init_centers, 'euclidean')
-    i=0
-    for sample in distances:
-        low = sys.maxint
-        assigned_center = None
-        j = 0
-        for center in sample:
-            if center < low:
-                low = center
-                assigned_center = j
-            j = j+1
-        centers[assigned_center] = (centers[assigned_center][0]+X[i], centers[assigned_center][1]+1)
-        i = i+1
-    
-    for i in xrange(len(centers.keys())):
-        emit(i, (centers[i][0].tolist(), centers[i][1]))
+    for elem in centers_weighted:
+        if elem[750]<0.1337 :
+            centers_weighted = np.delete(centers_weighted,i,0)
+        else:
+            i+=1
+    emit(1, centers_weighted.tolist())
 
