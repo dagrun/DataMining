@@ -25,3 +25,6 @@ ax.scatter(x, y)
 
 fig.show()
 plt.savefig('out.png')
+
+raw_input()
+
