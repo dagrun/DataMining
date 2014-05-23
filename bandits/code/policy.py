@@ -3,7 +3,7 @@
 import numpy.random
 from scipy.spatial.distance import cdist
 
-previos = []
+previous = []
 artWithUser = []
 epsilon = 1
 
@@ -16,26 +16,28 @@ def set_articles(art):
 # This function will be called by the evaluator.
 # Check task description for details.
 def update(reward):
-    if reward ==1
-    artWithUser.append(previos)
+    global epsilon
+    epsilon = epsilon * 0.9
+    if reward ==1:
+        artWithUser.append(previous)
 
 # This function will be called by the evaluator.
 # Check task description for det    ails.
 def reccomend(timestamp, user_features, articles):
-    previos = []
-    if previsoly.length > 0 && random.random() > epsilon:
+    previous = []
+    if len(previous) > 0 and random.random() > epsilon:
         prevUsers = artWithUser[:,:6]
-        distances = cdist(user_features, artWithUser, 'euclidean')
+        distances = cdist(user_features, prevUsers, 'euclidean')
         userIndex = distances.index(min(distances))
         prevArticle = artWithUser[userIndex]
         prevArticle = prevArticle[6:]
         distances = cdist(prevArticle, articles, 'euclidean')
         articleIndex = distances.index(min(distances))
         toReturn = articles[articleIndex]
-        previos.append(user_features)
-        previos.append(toReturn)
-        return
+        previous.append(user_features)
+        previous.append(toReturn[1:])
+        return toReturn
     toReturn = numpy.random.choice(articles, size=1)
-    previos.append(user_features)
-    previos.append(toReturn)
+    previous.append(user_features)
+    previous.append(toReturn[1:])
     return toReturn
