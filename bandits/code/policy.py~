@@ -16,11 +16,10 @@ def set_articles(art):
 # This function will be called by the evaluator.
 # Check task description for details.
 def update(reward):
-    if reward ==1
-    artWithUser.append(previos)
+    pass
 
 # This function will be called by the evaluator.
-# Check task description for det    ails.
+# Check task description for details.
 def reccomend(timestamp, user_features, articles):
     previos = []
     if previsoly.length > 0 && random.random() > epsilon:
