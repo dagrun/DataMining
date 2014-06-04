@@ -16,8 +16,16 @@ b_x = {}
 # Check evaluator.py description for details.
 def set_articles(art):
     global article_features
+    global M_x
+    global b_x
     
     article_features = art
+    
+    I = np.identity(d)
+    Z = np.zeros((d, 1))
+    for k in article_features.keys():
+        M_x[k] = np.copy(I)
+        b_x[k] = np.copy(Z)
 
 # This function will be called by the evaluator.
 # Check task description for details.
@@ -31,8 +39,6 @@ def update(reward):
 # This function will be called by the evaluator.
 # Check task description for details.
 def reccomend(timestamp, user_features, articles):
-    global M_x
-    global b_x
     global x_t
     global z_t
     
@@ -40,16 +46,16 @@ def reccomend(timestamp, user_features, articles):
     
     z_t = np.matrix(user_features).T
     
-    for art in articles:
-        if art not in M_x:
-            M_x[art] = np.identity(d)
-            b_x[art] = np.zeros((d, 1))
-        
-        M_x_inverse = np.linalg.inv(M_x[art])
-        predicted_w_x = np.dot(M_x_inverse, b_x[art])
+    all_M_x = [ M_x[art] for art in articles ]
+    all_M_x_inverse = np.linalg.inv(all_M_x)
+    
+    all_b_x = [ b_x[art] for art in articles ]
+    
+    for i in xrange(len(articles)):
+        predicted_w_x = np.dot(all_M_x_inverse[i], all_b_x[i])
         
         aux = np.dot(predicted_w_x.T, z_t)
-        UCB_x.append( aux + alpha * np.sqrt( np.dot(z_t.T, np.dot(M_x_inverse, z_t)) ) )
+        UCB_x.append( aux + alpha * np.sqrt( np.dot(z_t.T, np.dot(all_M_x_inverse[i], z_t)) ) )
     
     x_t = articles[np.argmax( UCB_x )]
     
